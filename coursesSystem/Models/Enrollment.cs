@@ -11,7 +11,7 @@ namespace coursesSystem.Models
 
         public Grade? Grade { get; set; }
 
-        // Navigation properties
+        // Navigation
         public virtual Student Student { get; set; }
         public virtual Course Course { get; set; }
     }

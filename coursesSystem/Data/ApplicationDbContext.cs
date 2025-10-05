@@ -14,29 +14,38 @@ namespace coursesSystem.Data
         {
         }
 
-        // DbSets for your system
+        // DbSets
         public DbSet<Student> Students { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
-        public DbSet<Instructor> Instructors { get; set; }
+        public DbSet<CourseAssignment> CourseAssignments { get; set; }
+        public DbSet<Department> Departments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Student ↔ AppUser (1-to-1)
+            // Composite unique constraints
             modelBuilder.Entity<Student>()
-                .HasOne<AppUser>()
-                .WithOne(u => u.StudentProfile)
-                .HasForeignKey<Student>(s => s.FullName);
+                .HasIndex(s => s.StudentNumber)
+                .IsUnique();
 
-            // Instructor ↔ AppUser (1-to-1)
             modelBuilder.Entity<Instructor>()
-                .HasOne<AppUser>()
-                .WithOne(u => u.InstructorProfile)
-                .HasForeignKey<Instructor>(i => i.FullName);
+                .HasIndex(i => i.EmployeeNumber)
+                .IsUnique();
 
-            // Enrollment relationships
+            // Relationships
+            modelBuilder.Entity<CourseAssignment>()
+                .HasOne(ca => ca.Course)
+                .WithMany(c => c.CourseAssignments)
+                .HasForeignKey(ca => ca.CourseId);
+
+            modelBuilder.Entity<CourseAssignment>()
+                .HasOne(ca => ca.Instructor)
+                .WithMany(i => i.CourseAssignments)
+                .HasForeignKey(ca => ca.InstructorId);
+
             modelBuilder.Entity<Enrollment>()
                 .HasOne(e => e.Student)
                 .WithMany(s => s.Enrollments)
@@ -47,12 +56,11 @@ namespace coursesSystem.Data
                 .WithMany(c => c.Enrollments)
                 .HasForeignKey(e => e.CourseId);
 
-            // Course ↔ Instructor (one-to-many)
-            modelBuilder.Entity<Course>()
-                .HasOne<Instructor>()
-                .WithMany(i => i.Courses)
-                .HasForeignKey("InstructorId")
-                .IsRequired(false);
+            modelBuilder.Entity<Department>()
+                .HasOne(d => d.Administrator)
+                .WithMany()
+                .HasForeignKey(d => d.InstructorId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

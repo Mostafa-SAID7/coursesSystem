@@ -5,13 +5,15 @@ namespace coursesSystem.Models
 {
     public class AppUser : IdentityUser
     {
-        [Required, StringLength(100)]
+        [Required, StringLength(150)]
         public string FullName { get; set; }
 
-        // Optional: flag to mark if user is an instructor or student
+        [DataType(DataType.Date)]
+        public DateTime DateOfBirth { get; set; }
+
         public bool IsInstructor { get; set; }
 
-        // Navigation properties
+        // Navigation
         public virtual Student StudentProfile { get; set; }
         public virtual Instructor InstructorProfile { get; set; }
     }

@@ -6,18 +6,17 @@ namespace coursesSystem.Models
     {
         public int StudentId { get; set; }
 
-        [Required, StringLength(100)]
-        public string FullName { get; set; }
+        [Required, StringLength(50)]
+        public string StudentNumber { get; set; } // e.g. "STU-2025001"
 
-        [Required, EmailAddress]
-        public string Email { get; set; }
-
+        [DataType(DataType.Date)]
         public DateTime EnrollmentDate { get; set; } = DateTime.Now;
 
-        // Link to Identity user
+        // Link to Identity User
         public string AppUserId { get; set; }
         public virtual AppUser AppUser { get; set; }
 
+        // Navigation
         public virtual ICollection<Enrollment> Enrollments { get; set; }
 
     }

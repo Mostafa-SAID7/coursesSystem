@@ -1,4 +1,5 @@
 using coursesSystem.Data;
+using coursesSystem.Data.Seeds;
 using coursesSystem.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,16 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+// SEED DATABASE
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
+    await DatabaseSeeder.SeedAsync(context, userManager, roleManager);
+}
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
