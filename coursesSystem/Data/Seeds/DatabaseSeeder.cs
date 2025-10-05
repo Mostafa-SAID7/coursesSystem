@@ -23,9 +23,10 @@ namespace coursesSystem.Data.Seeds
             }
 
             // 2. Create Admin User
-            if (await userManager.FindByEmailAsync("admin@system.com") == null)
+            var adminUser = await userManager.FindByEmailAsync("admin@system.com");
+            if (adminUser == null)
             {
-                var admin = new AppUser
+                adminUser = new AppUser
                 {
                     UserName = "admin@system.com",
                     Email = "admin@system.com",
@@ -33,71 +34,76 @@ namespace coursesSystem.Data.Seeds
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(admin, "Admin123!");
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(admin, "Admin");
-                }
+                await userManager.CreateAsync(adminUser, "Admin123!");
+                await userManager.AddToRoleAsync(adminUser, "Admin");
             }
 
-            // 3. Seed Instructors
-            if (!context.Instructors.Any())
+            // 3. Seed Instructor
+            if (!context.Instructors.Any(i => i.EmployeeNumber == "EMP-1001"))
             {
-                var instructor1User = new AppUser
+                var instructorUser = await userManager.FindByEmailAsync("jane.doe@school.com");
+                if (instructorUser == null)
                 {
-                    UserName = "jane.doe@school.com",
-                    Email = "jane.doe@school.com",
-                    FullName = "Jane Doe",
-                    IsInstructor = true,
-                    EmailConfirmed = true
-                };
-                await userManager.CreateAsync(instructor1User, "Password123!");
-                await userManager.AddToRoleAsync(instructor1User, "Instructor");
+                    instructorUser = new AppUser
+                    {
+                        UserName = "jane.doe@school.com",
+                        Email = "jane.doe@school.com",
+                        FullName = "Jane Doe",
+                        IsInstructor = true,
+                        EmailConfirmed = true
+                    };
+                    await userManager.CreateAsync(instructorUser, "Password123!");
+                    await userManager.AddToRoleAsync(instructorUser, "Instructor");
+                }
 
-                var instructor1 = new Instructor
+                var instructor = new Instructor
                 {
                     EmployeeNumber = "EMP-1001",
                     HireDate = DateTime.Now.AddYears(-5),
-                    AppUserId = instructor1User.Id
+                    AppUserId = instructorUser.Id
                 };
 
-                context.Instructors.Add(instructor1);
+                context.Instructors.Add(instructor);
                 await context.SaveChangesAsync();
             }
 
-            // 4. Seed Students
-            if (!context.Students.Any())
+            // 4. Seed Student
+            if (!context.Students.Any(s => s.StudentNumber == "STU-2001"))
             {
-                var student1User = new AppUser
+                var studentUser = await userManager.FindByEmailAsync("john.student@school.com");
+                if (studentUser == null)
                 {
-                    UserName = "john.student@school.com",
-                    Email = "john.student@school.com",
-                    FullName = "John Student",
-                    IsInstructor = false,
-                    EmailConfirmed = true
-                };
-                await userManager.CreateAsync(student1User, "Password123!");
-                await userManager.AddToRoleAsync(student1User, "Student");
+                    studentUser = new AppUser
+                    {
+                        UserName = "john.student@school.com",
+                        Email = "john.student@school.com",
+                        FullName = "John Student",
+                        IsInstructor = false,
+                        EmailConfirmed = true
+                    };
+                    await userManager.CreateAsync(studentUser, "Password123!");
+                    await userManager.AddToRoleAsync(studentUser, "Student");
+                }
 
-                var student1 = new Student
+                var student = new Student
                 {
                     StudentNumber = "STU-2001",
                     EnrollmentDate = DateTime.Now.AddYears(-1),
-                    AppUserId = student1User.Id
+                    AppUserId = studentUser.Id
                 };
 
-                context.Students.Add(student1);
+                context.Students.Add(student);
                 await context.SaveChangesAsync();
             }
 
-            // 5. Seed Departments and Courses
-            if (!context.Departments.Any())
+            // 5. Seed Department & Courses
+            if (!context.Departments.Any(d => d.Name == "Computer Science"))
             {
                 var dept = new Department
                 {
                     Name = "Computer Science",
                     Budget = 500000,
-                    StartDate = DateTime.Now.AddYears(-10),
+                    StartDate = DateTime.Now.AddYears(-10)
                 };
                 context.Departments.Add(dept);
                 await context.SaveChangesAsync();
@@ -106,14 +112,14 @@ namespace coursesSystem.Data.Seeds
                 {
                     Title = "Introduction to Programming",
                     Credits = 3,
-                    Description = "Learn the basics of C# and .NET",
+                    Description = "Learn the basics of C# and .NET"
                 };
 
                 var course2 = new Course
                 {
                     Title = "Databases 101",
                     Credits = 4,
-                    Description = "Fundamentals of SQL and relational databases",
+                    Description = "Fundamentals of SQL and relational databases"
                 };
 
                 context.Courses.AddRange(course1, course2);

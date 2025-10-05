@@ -1,49 +1,115 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - coursesSystem</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/coursesSystem.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">coursesSystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - coursesSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Tailwind CSS built via npm -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="flex flex-col min-h-screen bg-background-light text-text-light dark:bg-background-dark dark:text-text-dark transition-colors duration-300">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-white dark:bg-gray-900 shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="text-2xl font-bold text-primary dark:text-primary transition-colors">coursesSystem</a>
+
+            <nav>
+                <ul class="flex items-center space-x-6">
+
+                    <!-- Public links -->
+                    <li>
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary transition-colors">Home</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Courses" asp-action="Index" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary transition-colors">Courses</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Departments" asp-action="Index" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary transition-colors">Departments</a>
+                    </li>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <!-- Admin dropdown -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="relative group">
+                                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+                                   class="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary transition-colors">
+                                    Admin
+                                    <svg class="ml-1 w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </a>
+                                <ul class="absolute hidden group-hover:block bg-white dark:bg-gray-800 shadow-md mt-2 rounded-md py-1 w-48 z-10">
+                                    <li><a asp-area="Admin" asp-controller="Courses" asp-action="Index" class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Manage Courses</a></li>
+                                    <li><a asp-area="Admin" asp-controller="Instructors" asp-action="Index" class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Manage Instructors</a></li>
+                                    <li><a asp-area="Admin" asp-controller="Students" asp-action="Index" class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Manage Students</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                        <!-- Logout button -->
+                        <li>
+                            <form method="post" asp-area="Identity" asp-page="/Account/Logout" class="inline">
+                                <button type="submit" class="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <!-- Login/Register -->
+                        <li>
+                            <a asp-area="Identity" asp-page="/Account/Login" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary transition-colors">Login</a>
+                        </li>
+                        <li>
+                            <a asp-area="Identity" asp-page="/Account/Register" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-secondary transition-colors">Register</a>
+                        </li>
+                    }
+
+                    <!-- Dark mode toggle -->
+                    <li>
+                        <button id="darkModeToggle" class="px-3 py-1 rounded bg-primary text-white hover:bg-secondary transition-colors">
+                            Toggle Dark
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 container mx-auto px-4 py-6">
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-gray-900 border-t mt-auto py-6 shadow-inner">
+        <div class="container mx-auto px-4 text-center text-gray-600 dark:text-gray-400 space-y-2">
+            <p>&copy; 2025 - coursesSystem</p>
+            <p>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-primary dark:text-secondary hover:underline">Privacy</a> |
+                <a asp-area="" asp-controller="Home" asp-action="About" class="text-primary dark:text-secondary hover:underline">About</a> |
+                <a asp-area="" asp-controller="Home" asp-action="Contact" class="text-primary dark:text-secondary hover:underline">Contact</a>
+            </p>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Scripts -->
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        // Dark mode toggle
+        const toggleBtn = document.getElementById('darkModeToggle');
+        toggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // Persist user preference
+        if (localStorage.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </body>
 </html>
